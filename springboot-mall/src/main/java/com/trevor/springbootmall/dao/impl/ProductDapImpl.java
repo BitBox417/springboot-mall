@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Component
 public class ProductDapImpl implements ProductDao {
     @Autowired
@@ -65,4 +66,24 @@ public class ProductDapImpl implements ProductDao {
         int productId = keyHolder.getKey().intValue();
         return productId;
     }
+
+    @Override
+    public void updateProduct(Integer productId, ProductRequest productRequest) {
+        String sql = "UPDATE product SET product_name = :productName, category = :category, image_url = :imageUrl, " +
+                "price = :price, stock = :stock, description = :description, last_modified_date = :lastModifiedDate " +
+                "WHERE product_id = :productId";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("productId", productId);
+        map.put("productName", productRequest.getProductName());
+        map.put("category", productRequest.getCategory().toString()); // Make sure the category is converted to String if necessary
+        map.put("imageUrl", productRequest.getImageUrl());
+        map.put("price", productRequest.getPrice());
+        map.put("stock", productRequest.getStock());
+        map.put("description", productRequest.getDescription());
+        map.put("lastModifiedDate", new java.sql.Timestamp(new Date().getTime())); // Convert java.util.Date to java.sql.Timestamp
+
+        namedParameterJdbcTemplate.update(sql, map);
+    }
+
 }
