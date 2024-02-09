@@ -1,5 +1,6 @@
 package com.trevor.springbootmall.dao.impl;
 
+import com.trevor.springbootmall.constant.ProductCategory;
 import com.trevor.springbootmall.dao.ProductDao;
 import com.trevor.springbootmall.dto.ProductRequest;
 import com.trevor.springbootmall.model.Product;
@@ -24,12 +25,24 @@ public class ProductDapImpl implements ProductDao {
 
 
     @Override
-    public List<Product> getProducts() {
+    public List<Product> getProducts(ProductCategory category, String search) {
         String sql = "SELECT product_id, product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date " +
-                "FROM product";
+                "FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
-        List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
+
+//        AND前面要加空白建
+        if (category != null) {
+            sql = sql + " AND category = :category";
+            map.put("category", category.name());
+        }
+
+        if (search != null){
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%" + search + "%");
+        }
+
+            List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
         return productList;
     }
 
@@ -43,7 +56,7 @@ public class ProductDapImpl implements ProductDao {
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
-        if(productList.size() >0) {
+        if (productList.size() > 0) {
             return productList.get(0);
         } else {
             return null;
@@ -102,10 +115,10 @@ public class ProductDapImpl implements ProductDao {
     public void deleteProductById(Integer productId) {
         String sql = "DELETE FROM product WHERE product_id = :productId";
 
-        Map<String,Object> map = new HashMap<>();
-        map.put("productId",productId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("productId", productId);
 
-        namedParameterJdbcTemplate.update(sql,map);
+        namedParameterJdbcTemplate.update(sql, map);
 
     }
 }

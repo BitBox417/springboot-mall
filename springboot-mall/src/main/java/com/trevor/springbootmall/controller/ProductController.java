@@ -1,5 +1,6 @@
 package com.trevor.springbootmall.controller;
 
+import com.trevor.springbootmall.constant.ProductCategory;
 import com.trevor.springbootmall.dao.ProductDao;
 import com.trevor.springbootmall.dto.ProductRequest;
 import com.trevor.springbootmall.model.Product;
@@ -18,13 +19,14 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProduct(){
-       List<Product> productList = productService.getProducts();
+    public ResponseEntity<List<Product>> getProduct(
+       @RequestParam(required = false) ProductCategory category,
+       @RequestParam(required = false) String search
+    ){
+       List<Product> productList = productService.getProducts(category,search);
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
     }
-
-
 
 
 
