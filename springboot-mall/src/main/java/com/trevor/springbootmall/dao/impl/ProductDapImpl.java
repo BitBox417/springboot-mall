@@ -2,6 +2,7 @@ package com.trevor.springbootmall.dao.impl;
 
 import com.trevor.springbootmall.constant.ProductCategory;
 import com.trevor.springbootmall.dao.ProductDao;
+import com.trevor.springbootmall.dto.ProductQueryParams;
 import com.trevor.springbootmall.dto.ProductRequest;
 import com.trevor.springbootmall.model.Product;
 import com.trevor.springbootmall.rowmapper.ProductRowMapper;
@@ -25,21 +26,21 @@ public class ProductDapImpl implements ProductDao {
 
 
     @Override
-    public List<Product> getProducts(ProductCategory category, String search) {
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT product_id, product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date " +
                 "FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
 
 //        AND前面要加空白建
-        if (category != null) {
+        if (productQueryParams.getCategory() != null) {
             sql = sql + " AND category = :category";
-            map.put("category", category.name());
+            map.put("category", productQueryParams.getCategory().name());
         }
 
-        if (search != null){
+        if (productQueryParams.getSearch() != null){
             sql = sql + " AND product_name LIKE :search";
-            map.put("search", "%" + search + "%");
+            map.put("search", "%" + productQueryParams.getSearch() + "%");
         }
 
             List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());

@@ -2,6 +2,7 @@ package com.trevor.springbootmall.controller;
 
 import com.trevor.springbootmall.constant.ProductCategory;
 import com.trevor.springbootmall.dao.ProductDao;
+import com.trevor.springbootmall.dto.ProductQueryParams;
 import com.trevor.springbootmall.dto.ProductRequest;
 import com.trevor.springbootmall.model.Product;
 import com.trevor.springbootmall.service.ProductService;
@@ -23,7 +24,11 @@ public class ProductController {
        @RequestParam(required = false) ProductCategory category,
        @RequestParam(required = false) String search
     ){
-       List<Product> productList = productService.getProducts(category,search);
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setCategory(category);
+        productQueryParams.setSearch(search);
+
+       List<Product> productList = productService.getProducts(productQueryParams);
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
     }
