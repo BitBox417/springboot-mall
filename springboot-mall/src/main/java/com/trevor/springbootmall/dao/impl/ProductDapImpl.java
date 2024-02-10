@@ -43,6 +43,8 @@ public class ProductDapImpl implements ProductDao {
             map.put("search", "%" + productQueryParams.getSearch() + "%");
         }
 
+        sql = sql + " ORDER BY " + productQueryParams.getOrderByl() + " " + productQueryParams.getSort();
+
             List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
         return productList;
     }
@@ -62,7 +64,6 @@ public class ProductDapImpl implements ProductDao {
         } else {
             return null;
         }
-
     }
 
     @Override
