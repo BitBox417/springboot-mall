@@ -1,5 +1,6 @@
 package com.trevor.springbootmall.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trevor.springbootmall.dto.UserRegisterRequest;
 import com.trevor.springbootmall.model.User;
 import com.trevor.springbootmall.service.UserService;
@@ -23,6 +24,8 @@ public ResponseEntity<User> register(@RequestBody @Valid UserRegisterRequest use
     User user = userService.getUserById(userId);
 
     return  ResponseEntity.status(HttpStatus.CREATED).body(user);
+
+
 
 }
 }
