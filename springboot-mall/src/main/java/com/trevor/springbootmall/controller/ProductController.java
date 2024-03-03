@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @Validated
 @RestController
+@CrossOrigin
 public class ProductController {
     @Autowired
     private ProductService productService;
@@ -33,7 +34,7 @@ public class ProductController {
             @RequestParam(defaultValue = "desc") String sort,
 
             //分頁 pagination
-            @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,
+            @RequestParam(defaultValue = "10") @Max(1000) @Min(0) Integer limit,
             @RequestParam(defaultValue = "0") @Min(0) Integer offset
     ){
         ProductQueryParams productQueryParams = new ProductQueryParams();
