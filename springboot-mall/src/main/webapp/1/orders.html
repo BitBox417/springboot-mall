@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>我的訂單</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+  <script src="https://unpkg.com/vue@3"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="orders-app" class="ui container">
+    <h1 class="ui header">我的訂單</h1>
+    <div class="ui cards" v-for="order in orders" :key="order.orderId">
+      <div class="card">
+        <div class="content">
+          <div class="header">訂單編號：{{ order.orderId }}</div>
+          <div class="meta">訂單日期：{{ new Date(order.createdDate).toLocaleString() }}</div>
+          <div class="description">
+            <p>總金額：{{ order.totalAmount }}</p>
+            <button class="ui button" @click="toggle(order)">查看詳細</button>
+          </div>
+        </div>
+        <div class="extra content" v-if="activeOrder === order.orderId">
+          <div v-for="item in order.orderItemList" :key="item.orderItemId">
+            {{ item.productName }} - 數量：{{ item.quantity }} - 小計：{{ item.amount }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+
+    const app = createApp({
+      setup() {
+        const orders = ref([]);
+        const activeOrder = ref(null);
+
+        // 這個函數會從後端獲取訂單資料。
+      // 當用戶帳號功能實現後，應該使用從登入狀態獲取的真實用戶ID
+        const fetchOrders = async () => {
+            // TODO: 將 userId 替換為從登入系統獲取的用戶ID
+          const userId = 1; // Replace with the logged-in user's ID
+
+          try {
+            // TODO: 在請求中添加令牌來驗證用戶身份
+            const response = await axios.get(`http://localhost:8080/users/${userId}/orders`);
+            orders.value = response.data.results;
+          } catch (error) {
+            console.error("取得訂單資料時發生錯誤:", error);
+          }
+        };
+        // 用來展開或折疊訂單詳細資訊的函數
+        const toggle = (order) => {
+          activeOrder.value = activeOrder.value === order.orderId ? null : order.orderId;
+        };
+
+        // 立即調用 fetchOrders，但實際應用中可能會等待用戶登入
+      // TODO: 確保用戶已經登入並且 fetchOrders 能夠獲取正確的 userId
+        fetchOrders();
+
+        return {
+          orders,
+          activeOrder,
+          toggle
+        };
+      },
+    });
+
+    app.mount("#orders-app");
+  </script>
+</body>
+</html>

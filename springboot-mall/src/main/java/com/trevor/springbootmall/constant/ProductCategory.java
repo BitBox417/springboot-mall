@@ -4,7 +4,8 @@ public enum ProductCategory {
     FOOD,
     CAR,
     E_BOOK,
-    Gloves
+    Gloves,
+    登山裝備
 
 
 

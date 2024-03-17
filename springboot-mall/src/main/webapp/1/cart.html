@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>購物車</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="app" class="container mt-4">
+      <h1>購物車</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>商品</th>
+            <th>價格</th>
+            <th>數量</th>
+            <th>小計</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in cart" :key="item.productId">
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  :src="item.imageUrl"
+                  :alt="item.productName"
+                  class="mr-2"
+                  style="width: 50px; height: 50px"
+                />
+                {{ item.productName }}
+              </div>
+            </td>
+            <td>{{ item.price }}</td>
+            <td>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button
+                    class="btn btn-outline-secondary"
+                    @click="decrementQuantity(item)"
+                    :disabled="item.quantity <= 1"
+                  >
+                    -
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model.number="item.quantity"
+                  readonly
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-outline-secondary"
+                    @click="incrementQuantity(item)"
+                    :disabled="item.quantity >= item.stock"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </td>
+            <td>{{ item.quantity * item.price }}</td>
+            <td>
+              <button class="btn btn-danger" @click="removeFromCart(item)">
+                移除
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-right">總計:</td>
+            <td>{{ totalAmount }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="text-right">
+        <button
+          class="btn btn-primary"
+          @click="submitOrder"
+          :disabled="cart.length === 0"
+        >
+          提交訂單
+        </button>
+        
+      </div>
+    </div>
+
+    <script>
+      const { createApp, ref, computed } = Vue;
+
+      const app = createApp({
+        setup() {
+          const cart = ref([]);
+           // 計算總金額
+          const totalAmount = computed(() => {
+            return cart.value.reduce(
+              (total, item) => total + item.quantity * item.price,
+              0
+            );
+          });
+            // 增加商品數量
+          const incrementQuantity = (item) => {
+            if (item.quantity < item.stock) {
+              item.quantity++;
+            }
+          };
+          // 減少商品數量
+          const decrementQuantity = (item) => {
+            if (item.quantity > 1) {
+              item.quantity--;
+            }
+          };
+          // 從購物車移除商品
+          const removeFromCart = (item) => {
+            cart.value = cart.value.filter(
+              (i) => i.productId !== item.productId
+            );
+          };
+          // 提交訂單
+          const submitOrder = async () => {
+            try {
+               // TODO: 未來這裡需要使用真實的用戶ID，而不是假設為1。
+                // 這個ID應該從用戶登入狀態中獲取。
+              const userId = 1; // 假設已經登入的使用者 ID 為 1
+
+
+              // 創建訂單請求體
+              const createOrderRequest = {
+                buyItemList: cart.value.map((item) => ({
+                  productId: item.productId,
+                  quantity: item.quantity,
+                })),
+              };
+                // TODO: 發送訂單前需要添加用戶認證（例如JWT）
+              const response = await axios.post(
+                `http://localhost:8080/users/${userId}/orders`,
+                createOrderRequest
+              );
+              console.log("訂單已提交:", response.data);
+              cart.value = []; // 清空購物車
+              localStorage.removeItem("cart"); // 從本地存儲中移除購物車數據
+              alert("訂單已成功提交!");
+            } catch (error) {
+              console.error("提交訂單時發生錯誤:", error);
+              alert("提交訂單時發生錯誤,請重試。");
+            }
+          };
+
+          // 在組件掛載時從本地存儲加載購物車資料
+          const cartFromStorage =
+            JSON.parse(localStorage.getItem("cart")) || [];
+          cart.value = cartFromStorage;
+
+          return {
+            cart,
+            totalAmount,
+            incrementQuantity,
+            decrementQuantity,
+            removeFromCart,
+            submitOrder,
+          };
+        },
+      });
+
+      app.mount("#app");
+    </script>
+  </body>
+</html>

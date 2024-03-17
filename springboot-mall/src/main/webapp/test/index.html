@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>商品管理</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div id="app" class="container mt-5">
+        <button @click="addProduct" class="btn btn-primary mb-3">新增商品</button>
+
+        <div>
+            <form @submit.prevent="fetchProducts" class="form-inline mb-4">
+                <input type="text" v-model="searchQuery.search" placeholder="輸入產品名稱搜尋" class="form-control mr-2" />
+                <select v-model="searchQuery.category" class="form-control mr-2">
+                    <option value="">所有類別</option>
+                    <option value="ELECTRONICS">電子產品</option>
+                    <option value="FOOD">食品</option>
+                    <option value="CAR">車</option>
+                </select>
+                <button type="submit" class="btn btn-success">搜尋</button>
+            </form>
+        </div>
+
+        <h1>商品列表</h1>
+        <ul class="list-group mb-4">
+            <li v-for="product in products" :key="product.productId" class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <img :src="product.imageUrl" alt="商品圖片" class="img-thumbnail mr-3" style="width: 100px; height: 100px" />
+                    {{ product.productName }} - {{ product.price }}
+                </div>
+                <div>
+                    <button @click="deleteProduct(product.productId)" class="btn btn-danger mr-2">刪除</button>
+                    <button @click="editProduct(product)" class="btn btn-warning">編輯</button>
+                </div>
+            </li>
+        </ul>
+
+        <h2 v-if="isEditing">編輯商品</h2>
+        
+    </div>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
